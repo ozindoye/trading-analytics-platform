@@ -22,3 +22,16 @@ Each daily row stores the full open/high/low/close/volume bar, even though the f
 
 ## 7. Authentication as the final version, and non-gating
 I'm adding login (Spring Security + JWT) as its own final version, paired with a personal watchlist, rather than bolting it on early. A login only earns its place when it protects real per-user state, so auth and the watchlist ship together. I deliberately kept it non-gating: the core charts stay publicly viewable, and logging in only unlocks saving a watchlist — so the deployed app shows something immediately instead of a signup wall. It's last because it's the largest piece of new technology in the project, and placing it last keeps every earlier version independently deployable.
+
+## 8. Manual ingestion trigger during development
+Rather than wiring the scheduled job straight away, I trigger ingestion during development
+from a temporary endpoint I hit myself (POST /admin/ingest/{ticker}). This lets me control
+exactly when I spend real API credits instead of firing a call on every restart. The manual
+endpoint and the eventual scheduled job both call the same ingestion service, so the core
+logic is proven first and adding the scheduler later is a one-line change.
+
+## 9. Seeding funds with a CommandLineRunner
+I seed the three funds (SPY, QQQ, VTI) with a small CommandLineRunner that runs on startup,
+rather than a data.sql script. Doing it in Java means it uses my own entities and I can
+explain every line, and checking whether each ticker already exists before inserting makes
+it safe to run on every boot, which matters because my in-memory dev database resets each time.
