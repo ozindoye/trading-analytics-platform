@@ -1,0 +1,8 @@
+### Ingest SPY daily prices
+POST http://localhost:8080/admin/ingest/SPY
+
+### Ingest QQQ daily prices
+POST http://localhost:8080/admin/ingest/QQQ
+
+### Ingest VTI daily prices
+POST http://localhost:8080/admin/ingest/VTI
