@@ -35,3 +35,11 @@ I seed the three funds (SPY, QQQ, VTI) with a small CommandLineRunner that runs 
 rather than a data.sql script. Doing it in Java means it uses my own entities and I can
 explain every line, and checking whether each ticker already exists before inserting makes
 it safe to run on every boot, which matters because my in-memory dev database resets each time.
+
+## 10. v1 price endpoint: minimal shape, full history
+My price endpoint returns just the date and close for each bar, not the full OHLCV, because
+that is exactly what the v1 line chart needs and it keeps the API contract and payload
+minimal. I also return a fund's whole history and let the frontend's time buttons window it
+client-side, rather than filtering by date on the server. That is the simplest path to a
+working chart, and I have left a server-side date range as an easy enhancement to add before
+the payload size actually matters.
