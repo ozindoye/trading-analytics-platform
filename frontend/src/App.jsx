@@ -4,20 +4,38 @@ import PriceChart from './PriceChart'
 
 const FUNDS = ['SPY', 'QQQ', 'VTI']
 
+const RANGES = [
+    { label: '1M', months: 1 },
+    { label: '3M', months: 3 },
+    { label: '6M', months: 6 },
+    { label: '1Y', months: 12 },
+    { label: 'Max', months: null },
+]
+
+function computeFrom(months) {
+    if (months === null) return null
+    const d = new Date()
+    d.setMonth(d.getMonth() - months)
+    return d.toISOString().slice(0, 10)
+}
+
 function App() {
     const [ticker, setTicker] = useState('SPY')
     const [data, setData] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const [range, setRange] = useState('1Y')
 
     useEffect(() => {
         setLoading(true)
         setError(null)
-        getPriceHistory(ticker)
+        const months = RANGES.find((r) => r.label === range).months
+        const from = computeFrom(months)
+        getPriceHistory(ticker, from)
             .then((prices) => setData(prices))
             .catch((err) => setError(err.message))
             .finally(() => setLoading(false))
-    }, [ticker])
+    }, [ticker, range])
 
     return (
         <div className="min-h-screen bg-gray-50 text-gray-900">
@@ -38,6 +56,23 @@ function App() {
                             }
                         >
                             {f}
+                        </button>
+                    ))}
+                </div>
+
+                <div className="flex gap-2 mt-3">
+                    {RANGES.map((r) => (
+                        <button
+                            key={r.label}
+                            onClick={() => setRange(r.label)}
+                            className={
+                                'px-3 py-1.5 rounded-md text-sm font-medium border ' +
+                                (r.label === range
+                                    ? 'bg-gray-900 text-white border-gray-900'
+                                    : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400')
+                            }
+                        >
+                            {r.label}
                         </button>
                     ))}
                 </div>
