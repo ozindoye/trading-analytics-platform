@@ -1,6 +1,7 @@
 package com.ousman.trading_analytics_platform.controller;
 
 import com.ousman.trading_analytics_platform.service.PriceIngestionService;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 // TEMPORARY dev-only trigger for ingestion. Replaced/secured once @Scheduled takes over.
+@Profile("!prod")
 @RestController
 @RequestMapping("/admin/ingest")
 public class IngestionAdminController {

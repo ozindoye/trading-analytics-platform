@@ -2,11 +2,10 @@ package com.ousman.trading_analytics_platform.controller;
 
 import com.ousman.trading_analytics_platform.dto.PriceBarResponse;
 import com.ousman.trading_analytics_platform.service.PriceQueryService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -20,7 +19,10 @@ public class PriceController {
     }
 
     @GetMapping("/{ticker}/prices")
-    public List<PriceBarResponse> getPrices(@PathVariable String ticker) {
-        return priceQueryService.getPriceHistory(ticker);
+    public List<PriceBarResponse> getPrices(
+            @PathVariable String ticker,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from) {
+        return priceQueryService.getPriceHistory(ticker, from);
     }
 }
