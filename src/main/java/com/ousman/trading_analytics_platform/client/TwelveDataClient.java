@@ -15,13 +15,13 @@ public class TwelveDataClient {
         this.restClient = RestClient.create(properties.baseUrl());
     }
 
-    public TwelveDataTimeSeriesResponse fetchDailySeries(String symbol) {
+    public TwelveDataTimeSeriesResponse fetchDailySeries(String symbol, int outputSize) {
         return restClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/time_series")
                         .queryParam("symbol", symbol)
                         .queryParam("interval", "1day")
-                        .queryParam("outputsize", 5000)
+                        .queryParam("outputsize", outputSize)
                         .queryParam("apikey", properties.apiKey())
                         .build())
                 .retrieve()

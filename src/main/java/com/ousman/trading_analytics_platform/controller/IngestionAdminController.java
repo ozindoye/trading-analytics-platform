@@ -23,7 +23,7 @@ public class IngestionAdminController {
     @PostMapping("/{ticker}")
     public ResponseEntity<String> ingest(@PathVariable String ticker) {
         String symbol = ticker.toUpperCase();
-        int saved = priceIngestionService.ingestDailyPrices(symbol);
+        int saved = priceIngestionService.ingestDailyPrices(symbol, 5000);
         return ResponseEntity.ok("Ingested " + saved + " new bars for " + symbol);
     }
 }

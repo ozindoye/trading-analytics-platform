@@ -23,11 +23,13 @@ public class PriceIngestionScheduler {
         this.priceIngestionService = priceIngestionService;
     }
 
+    private static final int REFRESH_BARS = 30;
+
     @Scheduled(initialDelayString = "PT30S", fixedDelayString = "PT24H")
     public void refreshAllFunds() {
         for (Fund fund : fundRepository.findAll()) {
             try {
-                int saved = priceIngestionService.ingestDailyPrices(fund.getTicker());
+                int saved = priceIngestionService.ingestDailyPrices(fund.getTicker(), REFRESH_BARS);
                 log.info("Scheduled ingest for {}: {} new bars saved", fund.getTicker(), saved);
             } catch (Exception e) {
                 log.error("Scheduled ingest failed for {}: {}", fund.getTicker(), e.getMessage());
