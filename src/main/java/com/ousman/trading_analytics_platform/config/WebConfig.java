@@ -12,7 +12,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/api/**")
                 .allowedOrigins(
                         "http://localhost:5173",
-                        "https://https://trading-analytics-platform-ten.vercel.app"
+                        "https://trading-analytics-platform-ten.vercel.app"
                 )
                 .allowedMethods("GET");
     }
