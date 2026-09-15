@@ -43,3 +43,15 @@ minimal. I also return a fund's whole history and let the frontend's time button
 client-side, rather than filtering by date on the server. That is the simplest path to a
 working chart, and I have left a server-side date range as an easy enhancement to add before
 the payload size actually matters.
+
+## 11. Ingestion trigger: manual in dev, scheduled in prod
+I trigger data ingestion differently per environment, using Spring profiles so the two never
+overlap. In development I keep the manual endpoint I built (scoped with @Profile("!prod")),
+and in production a @Scheduled job (scoped with @Profile("prod")) refreshes the funds
+automatically. A useful side effect is that the manual endpoint does not exist in production
+at all, which removes an unsecured endpoint that could otherwise be hit to burn through my
+API credits. I used a delay-based schedule (run about 30 seconds after startup, then every
+24 hours) rather than a cron expression, so a fresh deploy fills its database almost
+immediately instead of waiting for a set time. Each fund is ingested in its own try/catch so
+one failure does not stop the others, and because ingestion is idempotent the daily refresh
+only ever saves genuinely new bars.
