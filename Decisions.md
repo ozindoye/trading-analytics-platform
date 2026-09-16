@@ -55,3 +55,23 @@ API credits. I used a delay-based schedule (run about 30 seconds after startup, 
 immediately instead of waiting for a set time. Each fund is ingested in its own try/catch so
 one failure does not stop the others, and because ingestion is idempotent the daily refresh
 only ever saves genuinely new bars.
+
+## 12. Deployment: Railway plus MySQL, Vercel for the frontend
+I deployed the backend and a managed MySQL database to Railway, and the React frontend to
+Vercel. I chose Railway (about £5/month) over a free option like Render because a free
+backend sleeps after inactivity and its free database expires after 30 days, both of which
+would make the demo look broken when someone clicks it. Since this is the project I show
+recruiters, an always-on, instant-loading demo was worth the small cost, and Railway also
+offers MySQL so production matches the stack I designed for. In production the app runs under
+a Spring "prod" profile pointing at MySQL, and every secret and connection detail (API key,
+database URL, username, password) is injected as an environment variable on the host rather
+than committed, so one codebase runs on H2 locally and MySQL in production with no secrets in
+the repo.
+
+## 13. Production ingestion is incremental, to bound memory
+My scheduled ingestion originally pulled the full 20-year history for all three funds on
+every run, which crashed the production container by running it out of memory. I changed the
+scheduled job to fetch only recent bars (about 30 days), because a daily refresh only needs
+to catch what is new, not re-download two decades each time. Full-history loading stays a
+deliberate on-demand action in development, where memory is not constrained. This fixed the
+crash and is the correct design: the production refresh is incremental and memory-light.
