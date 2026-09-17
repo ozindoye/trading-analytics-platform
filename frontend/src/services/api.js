@@ -24,3 +24,30 @@ export async function getComparison(tickers, from) {
     }
     return response.json()
 }
+
+export async function getMetrics(ticker, from) {
+    const params = new URLSearchParams();
+
+    if (from) {
+        // Backend expects an ISO date like "2025-06-30".
+        // Handle both a Date object and a string, and trim any time portion.
+        const iso =
+            from instanceof Date
+                ? from.toISOString().slice(0, 10)
+                : String(from).slice(0, 10);
+        params.append("from", iso);
+    }
+
+    const query = params.toString();
+    const url = `${BASE_URL}/api/funds/${ticker}/metrics${
+        query ? `?${query}` : ""
+    }`;
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        throw new Error(`Failed to load metrics for ${ticker} (${response.status})`);
+    }
+
+    return response.json();
+}

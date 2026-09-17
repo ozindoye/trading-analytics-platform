@@ -3,6 +3,7 @@ import { getPriceHistory } from './services/api'
 import PriceChart from './PriceChart'
 import CompareSection from './CompareSection'
 import { RANGES, computeFrom } from './ranges'
+import StatCards from './components/StatCards'
 
 const FUNDS = ['SPY', 'QQQ', 'VTI']
 
@@ -13,11 +14,13 @@ function App() {
     const [error, setError] = useState(null)
     const [range, setRange] = useState('1Y')
 
+    // Moved OUT of the effect so the JSX (StatCards) can use `from` too.
+    const months = RANGES.find((r) => r.label === range).months
+    const from = computeFrom(months)
+
     useEffect(() => {
         setLoading(true)
         setError(null)
-        const months = RANGES.find((r) => r.label === range).months
-        const from = computeFrom(months)
         getPriceHistory(ticker, from)
             .then((prices) => setData(prices))
             .catch((err) => setError(err.message))
@@ -69,6 +72,11 @@ function App() {
                     {error && <p className="text-red-600 py-20 text-center">Could not load data: {error}</p>}
                     {!loading && !error && <PriceChart data={data} />}
                 </div>
+
+                <div className="mt-6">
+                    <StatCards ticker={ticker} from={from} />
+                </div>
+
                 <CompareSection />
             </div>
         </div>
