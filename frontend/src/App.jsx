@@ -1,23 +1,10 @@
 import { useEffect, useState } from 'react'
 import { getPriceHistory } from './services/api'
 import PriceChart from './PriceChart'
+import CompareSection from './CompareSection'
+import { RANGES, computeFrom } from './ranges'
 
 const FUNDS = ['SPY', 'QQQ', 'VTI']
-
-const RANGES = [
-    { label: '1M', months: 1 },
-    { label: '3M', months: 3 },
-    { label: '6M', months: 6 },
-    { label: '1Y', months: 12 },
-    { label: 'Max', months: null },
-]
-
-function computeFrom(months) {
-    if (months === null) return null
-    const d = new Date()
-    d.setMonth(d.getMonth() - months)
-    return d.toISOString().slice(0, 10)
-}
 
 function App() {
     const [ticker, setTicker] = useState('SPY')
@@ -82,6 +69,7 @@ function App() {
                     {error && <p className="text-red-600 py-20 text-center">Could not load data: {error}</p>}
                     {!loading && !error && <PriceChart data={data} />}
                 </div>
+                <CompareSection />
             </div>
         </div>
     )

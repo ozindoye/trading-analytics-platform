@@ -11,3 +11,16 @@ export async function getPriceHistory(ticker, from) {
     }
     return response.json()
 }
+
+export async function getComparison(tickers, from) {
+    const url = new URL(`${BASE_URL}/api/funds/compare`)
+    url.searchParams.set('tickers', tickers.join(','))
+    if (from) {
+        url.searchParams.set('from', from)
+    }
+    const response = await fetch(url)
+    if (!response.ok) {
+        throw new Error(`Failed to load comparison (status ${response.status})`)
+    }
+    return response.json()
+}
