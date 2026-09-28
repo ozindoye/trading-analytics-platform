@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/funds")
@@ -24,5 +25,13 @@ public class PriceController {
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from) {
         return priceQueryService.getPriceHistory(ticker, from);
+    }
+
+    @GetMapping("/compare")
+    public List<Map<String, Object>> compare(
+            @RequestParam List<String> tickers,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from) {
+        return priceQueryService.comparePerformance(tickers, from);
     }
 }

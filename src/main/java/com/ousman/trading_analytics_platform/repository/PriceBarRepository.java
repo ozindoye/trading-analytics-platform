@@ -14,4 +14,6 @@ public interface PriceBarRepository extends JpaRepository<PriceBar, Long> {
     boolean existsByFundAndDate(Fund fund, LocalDate date);
 
     List<PriceBar> findByFundAndDateGreaterThanEqualOrderByDateAsc(Fund fund, LocalDate from);
+
+    List<PriceBar> findByFundAndDateBetweenOrderByDateAsc(Fund fund, LocalDate from, LocalDate to);
 }

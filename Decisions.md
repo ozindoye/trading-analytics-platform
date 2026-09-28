@@ -75,3 +75,22 @@ scheduled job to fetch only recent bars (about 30 days), because a daily refresh
 to catch what is new, not re-download two decades each time. Full-history loading stays a
 deliberate on-demand action in development, where memory is not constrained. This fixed the
 crash and is the correct design: the production refresh is incremental and memory-light.
+
+## 14. Fund comparison is computed server-side
+For comparing funds I built a dedicated endpoint that returns each fund's series already
+rebased to percentage change from the start of the window and aligned by date, rather than
+having the frontend fetch each fund separately and do the maths itself. Comparing funds
+fairly means comparing performance, not price level, so each fund is normalised to
+(close / firstClose − 1) × 100 with its own first close in the window as the 0% baseline.
+Keeping this on the server means the transform lives in one place I can unit-test, the
+frontend just draws the result, it is one request instead of several, and it sets up the
+metrics work in v3 to live in the same computation layer.
+
+## 15. Sharpe ratio: assume a 0% risk-free rate
+The Sharpe ratio is return per unit of risk — (return − risk-free rate) ÷ volatility. Doing it precisely would mean sourcing and date-aligning a daily risk-free series (like T-bills), which is a whole second data feed for very little payoff in a tool where every fund is judged on the same basis. So I assumed a 0% risk-free rate and documented it as a deliberate simplification rather than burying it. The ranking between funds barely shifts, the metric stays honest and comparable, and if I ever want the exact figure it's a single constant to change.
+
+## 16. Track raw OHLC, not dividend/split-adjusted close
+The technically correct input for long-run return and volatility is the adjusted close, which folds dividends and splits back into the price. Twelve Data's free tier doesn't expose it, and I didn't want to pay for a higher tier or hand-roll an adjustment I couldn't fully stand behind. So I store the raw OHLC the free tier gives me and call out the limitation openly. Over the recent windows this app compares, the difference is small.
+
+## 17. Metrics are windowed server-side via optional from/to dates
+The stat cards sit above the chart, so if the chart shows one month and the cards report all-time figures, the whole thing looks broken. Metrics have to track the visible window. My metrics endpoint takes optional from and to ISO dates and recomputes over that window server-side, and no params still means full history. I chose explicit dates over a ?range=1M token so the backend stays ignorant of the UI's presets, the contract stays RESTful, and it's exactly the shape my later custom date-picker will need, so the presets wire up now and the picker slots into the same endpoint with no backend change. Crucially my MetricsCalculator doesn't change at all, it still just takes a list of price bars, so only the query that selects the bars changed and my unit tests still hold.

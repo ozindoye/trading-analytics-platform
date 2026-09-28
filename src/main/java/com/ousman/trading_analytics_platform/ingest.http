@@ -12,3 +12,30 @@ GET http://localhost:8080/api/funds/SPY/prices
 
 ### Get Non-Existent Ticker
 GET http://localhost:8080/api/funds/ZZZ/prices
+
+### Compare funds
+GET http://localhost:8080/api/funds/compare?tickers=SPY,QQQ,VTI&from=2024-01-01
+
+### Get Metrics
+GET http://localhost:8080/api/funds/SPY/metrics
+Accept: application/json
+
+### Get Non-Existent Ticker Metrics
+GET http://localhost:8080/api/funds/FAKE/metrics
+Accept: application/json
+
+### All-time (no params)
+GET http://localhost:8080/api/funds/SPY/metrics
+Accept: application/json
+
+### Windowed
+GET http://localhost:8080/api/funds/SPY/metrics?from=2025-01-01&to=2025-06-30
+Accept: application/json
+
+### from only (defaults 'to' to today)
+GET http://localhost:8080/api/funds/SPY/metrics?from=2025-01-01
+Accept: application/json
+
+### Reversed range -> 400
+GET http://localhost:8080/api/funds/SPY/metrics?from=2025-06-30&to=2025-01-01
+Accept: application/json
