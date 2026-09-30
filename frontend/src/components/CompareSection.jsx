@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { getComparison } from './services/api'
-import { RANGES, computeFrom } from './ranges'
+import { getComparison } from '../services/api'
+import { RANGES, computeFrom } from '../ranges'
 import CompareChart from './CompareChart'
 
 const ALL_FUNDS = ['SPY', 'QQQ', 'VTI']

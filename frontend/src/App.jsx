@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { getPriceHistory } from './services/api'
-import PriceChart from './PriceChart'
-import CompareSection from './CompareSection'
 import { RANGES, computeFrom } from './ranges'
+import PriceChart from './components/PriceChart'
 import StatCards from './components/StatCards'
+import CompareSection from './components/CompareSection'
 
 const FUNDS = ['SPY', 'QQQ', 'VTI']
 
