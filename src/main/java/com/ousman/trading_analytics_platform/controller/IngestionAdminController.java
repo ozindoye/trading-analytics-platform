@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-// TEMPORARY dev-only trigger for ingestion. Replaced/secured once @Scheduled takes over.
+// Dev-only manual trigger for a full-history backfill (~5000 bars).
+// Excluded from prod by @Profile, where PriceIngestionScheduler does incremental refreshes instead.
 @Profile("!prod")
 @RestController
 @RequestMapping("/admin/ingest")

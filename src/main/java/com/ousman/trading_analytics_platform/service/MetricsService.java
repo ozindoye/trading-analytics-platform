@@ -6,7 +6,6 @@ import com.ousman.trading_analytics_platform.model.Fund;
 import com.ousman.trading_analytics_platform.model.PriceBar;
 import com.ousman.trading_analytics_platform.repository.FundRepository;
 import com.ousman.trading_analytics_platform.repository.PriceBarRepository;
-import com.ousman.trading_analytics_platform.service.MetricsCalculator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

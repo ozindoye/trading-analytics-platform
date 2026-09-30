@@ -8,15 +8,15 @@ import com.ousman.trading_analytics_platform.model.PriceBar;
 import com.ousman.trading_analytics_platform.repository.FundRepository;
 import com.ousman.trading_analytics_platform.repository.PriceBarRepository;
 import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.time.LocalDate;
-import java.util.List;
 
 @Service
 public class PriceQueryService {
