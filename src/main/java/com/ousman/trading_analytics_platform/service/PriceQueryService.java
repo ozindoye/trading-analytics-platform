@@ -8,6 +8,7 @@ import com.ousman.trading_analytics_platform.model.PriceBar;
 import com.ousman.trading_analytics_platform.repository.FundRepository;
 import com.ousman.trading_analytics_platform.repository.PriceBarRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -30,6 +31,7 @@ public class PriceQueryService {
         this.priceBarRepository = priceBarRepository;
     }
 
+    @Transactional(readOnly = true)
     public List<PriceBarResponse> getPriceHistory(String ticker, LocalDate from) {
         Fund fund = fundRepository.findByTicker(ticker.toUpperCase())
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -44,6 +46,7 @@ public class PriceQueryService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<Map<String, Object>> comparePerformance(List<String> tickers, LocalDate from) {
         TreeMap<LocalDate, Map<String, Object>> rowsByDate = new TreeMap<>();
 
