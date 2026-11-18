@@ -25,7 +25,10 @@ public class MetricsService {
     }
 
     @Transactional(readOnly = true)
-    public MetricsResponse getMetrics(String ticker, LocalDate from, LocalDate to) {
+    public MetricsResponse getMetrics(String rawTicker, LocalDate from, LocalDate to) {
+        // Tickers are stored upper-case, so /spy/metrics has to find the same fund as /SPY/metrics,
+        // matching what PriceQueryService already does for /prices.
+        String ticker = rawTicker.toUpperCase();
         Fund fund = fundRepository.findByTicker(ticker)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "No fund found with ticker " + ticker));

@@ -39,3 +39,21 @@ Accept: application/json
 ### Reversed range -> 400
 GET http://localhost:8080/api/funds/SPY/metrics?from=2025-06-30&to=2025-01-01
 Accept: application/json
+
+### --- A3: ticker validation ---
+
+### Lower-case ticker on metrics -> same result as SPY (was 404 before A3)
+GET http://localhost:8080/api/funds/spy/metrics
+Accept: application/json
+
+### Digit in ticker -> 400
+GET http://localhost:8080/api/funds/SP1/prices
+Accept: application/json
+
+### Ticker longer than 10 letters -> 400
+GET http://localhost:8080/api/funds/ABCDEFGHIJK/metrics
+Accept: application/json
+
+### One bad ticker in compare -> 400
+GET http://localhost:8080/api/funds/compare?tickers=SPY,b@d
+Accept: application/json
