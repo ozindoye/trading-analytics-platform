@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.time.Instant;
-import java.util.stream.Collectors;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -38,11 +39,13 @@ public class GlobalExceptionHandler {
     // and clients would have to handle two different error shapes from the same API.
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<ErrorResponse> handleValidation(HandlerMethodValidationException ex) {
-        // distinct() because /compare with two bad tickers would otherwise repeat the same message
-        String message = ex.getAllErrors().stream()
-                .map(MessageSourceResolvable::getDefaultMessage)
-                .distinct()
-                .collect(Collectors.joining("; "));
+        // A Set because /compare with two bad tickers would otherwise repeat the same message,
+        // and LinkedHashSet so the messages stay in the order the parameters failed.
+        Set<String> messages = new LinkedHashSet<>();
+        for (MessageSourceResolvable error : ex.getAllErrors()) {
+            messages.add(error.getDefaultMessage());
+        }
+        String message = String.join("; ", messages);
 
         ErrorResponse body = new ErrorResponse(
                 Instant.now(),
