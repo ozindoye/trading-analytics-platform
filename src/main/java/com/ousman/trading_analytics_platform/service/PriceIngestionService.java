@@ -18,6 +18,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class PriceIngestionService {
@@ -54,6 +55,7 @@ public class PriceIngestionService {
         }
 
         ZonedDateTime now = ZonedDateTime.now(MARKET_ZONE);
+        Set<LocalDate> storedDates = priceBarRepository.findDatesByFund(fund);
 
         List<PriceBar> newBars = new ArrayList<>();
         for (TwelveDataValue value : response.values()) {
@@ -65,7 +67,7 @@ public class PriceIngestionService {
                 continue;
             }
 
-            if (priceBarRepository.existsByFundAndDate(fund, date)) {
+            if (storedDates.contains(date)) {
                 continue;
             }
 
