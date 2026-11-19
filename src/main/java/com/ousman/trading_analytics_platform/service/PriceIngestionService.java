@@ -13,11 +13,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class PriceIngestionService {
+
+    // All my funds are US-listed, so "today" and "after the close" have to be judged
+    // on the exchange's clock, not the server's (Railway runs in UTC).
+    static final ZoneId MARKET_ZONE = ZoneId.of("America/New_York");
+
+    // The close is 16:00; I give the provider half an hour to publish the final daily bar.
+    static final LocalTime BAR_FINAL_AFTER = LocalTime.of(16, 30);
 
     private final TwelveDataClient twelveDataClient;
     private final FundRepository fundRepository;
@@ -43,9 +53,17 @@ public class PriceIngestionService {
             throw new IllegalStateException("Twelve Data returned no usable data for " + ticker);
         }
 
+        ZonedDateTime now = ZonedDateTime.now(MARKET_ZONE);
+
         List<PriceBar> newBars = new ArrayList<>();
         for (TwelveDataValue value : response.values()) {
             LocalDate date = LocalDate.parse(value.datetime());
+
+            // A bar stored mid-session would never be corrected, because existing dates are
+            // skipped on every later run. Leaving it out means the next run picks it up complete.
+            if (!isCompleteBar(date, now)) {
+                continue;
+            }
 
             if (priceBarRepository.existsByFundAndDate(fund, date)) {
                 continue;
@@ -64,5 +82,20 @@ public class PriceIngestionService {
 
         priceBarRepository.saveAll(newBars);
         return newBars.size();
+    }
+
+    // Static and given "now" as an argument so I can test every case with fixed times,
+    // without waiting for a real market close.
+    static boolean isCompleteBar(LocalDate barDate, ZonedDateTime now) {
+        ZonedDateTime marketNow = now.withZoneSameInstant(MARKET_ZONE);
+        LocalDate marketToday = marketNow.toLocalDate();
+
+        if (barDate.isBefore(marketToday)) {
+            return true;
+        }
+        if (barDate.isAfter(marketToday)) {
+            return false;
+        }
+        return !marketNow.toLocalTime().isBefore(BAR_FINAL_AFTER);
     }
 }
