@@ -1,5 +1,6 @@
 package com.ousman.trading_analytics_platform.controller;
 
+import com.ousman.trading_analytics_platform.dto.CompareRowResponse;
 import com.ousman.trading_analytics_platform.dto.PriceBarResponse;
 import com.ousman.trading_analytics_platform.service.PriceQueryService;
 import jakarta.validation.constraints.Pattern;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 // No @Validated on purpose: Spring MVC validates constrained parameters by itself
 // and throws HandlerMethodValidationException, which GlobalExceptionHandler turns into a 400.
@@ -42,7 +42,7 @@ public class PriceController {
     // The constraint sits on the element type so each ticker in the list is checked,
     // not the list itself.
     @GetMapping("/compare")
-    public List<Map<String, Object>> compare(
+    public List<CompareRowResponse> compare(
             @RequestParam List<@Pattern(regexp = TICKER_REGEX, message = TICKER_MESSAGE) String> tickers,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from) {

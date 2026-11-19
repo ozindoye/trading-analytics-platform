@@ -1,5 +1,6 @@
 package com.ousman.trading_analytics_platform.service;
 
+import com.ousman.trading_analytics_platform.dto.CompareRowResponse;
 import com.ousman.trading_analytics_platform.dto.PriceBarMapper;
 import com.ousman.trading_analytics_platform.dto.PriceBarResponse;
 import com.ousman.trading_analytics_platform.exception.ResourceNotFoundException;
@@ -13,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,8 +47,10 @@ public class PriceQueryService {
     }
 
     @Transactional(readOnly = true)
-    public List<Map<String, Object>> comparePerformance(List<String> tickers, LocalDate from) {
-        TreeMap<LocalDate, Map<String, Object>> rowsByDate = new TreeMap<>();
+    public List<CompareRowResponse> comparePerformance(List<String> tickers, LocalDate from) {
+        // TreeMap keeps the rows in date order; the inner LinkedHashMap keeps tickers
+        // in the order they were requested, so the chart legend matches the user's selection.
+        TreeMap<LocalDate, Map<String, BigDecimal>> changesByDate = new TreeMap<>();
 
         for (String rawTicker : tickers) {
             String ticker = rawTicker.trim().toUpperCase();
@@ -73,15 +75,13 @@ public class PriceQueryService {
                         .multiply(BigDecimal.valueOf(100))
                         .setScale(2, RoundingMode.HALF_UP);
 
-                Map<String, Object> row = rowsByDate.computeIfAbsent(bar.getDate(), d -> {
-                    Map<String, Object> newRow = new LinkedHashMap<>();
-                    newRow.put("date", d);
-                    return newRow;
-                });
-                row.put(ticker, pctChange);
+                changesByDate.computeIfAbsent(bar.getDate(), d -> new LinkedHashMap<>())
+                        .put(ticker, pctChange);
             }
         }
 
-        return new ArrayList<>(rowsByDate.values());
+        return changesByDate.entrySet().stream()
+                .map(entry -> new CompareRowResponse(entry.getKey(), entry.getValue()))
+                .toList();
     }
 }
